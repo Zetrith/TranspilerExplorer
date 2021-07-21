@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>Transpiler Explorer</title>
+        <link rel="stylesheet" href="prism.css"/>
+        <link rel="stylesheet" href="style.css"/>
+        <script src="prism.js"></script>
+		<script src="diff.js"></script>
+        <script src="script.js"></script>
+    </head>
+    <body class="match-braces">
+        <div class="selector">
+            <input type="text" id="tr-search" placeholder="Filter">
+            <select name="trs" id="tr-select"></select>
+        </div>
+        <div class="main">
+            <pre><code id="code-label" class="language-csharp"></code></pre>
+            <div class="buttons">
+                <button class="lang-button" type="button">C#</button>
+                <button class="lang-button" type="button">IL</button>
+            </div>
+            <p id="il-diff-note" style="display: none;">Note: IL diffing ignores labels. The diff might not be accurate.</p>
+            <div class="tabs">
+                <div id="code1" class="code-tab" data-code-type="original">
+                    <p>Original:</p>
+                    <pre id="code1pre" class="line-numbers"><code class="language-csharp"></code></pre>
+                </div>
+                <div id="code2" class="code-tab" data-code-type="transpiled">
+                    <p>Transpiled:</p>
+                    <pre id="code2pre" class="line-numbers"><code class="language-csharp"></code></pre>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
