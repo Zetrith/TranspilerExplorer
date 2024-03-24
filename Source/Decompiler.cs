@@ -3,8 +3,6 @@ using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.DebugInfo;
 using ICSharpCode.Decompiler.Disassembler;
-using ICSharpCode.Decompiler.IL;
-using ICSharpCode.Decompiler.IL.Transforms;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
 using Mono.Cecil;
@@ -18,11 +16,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
-using Verse;
 
 namespace TranspilerExplorer
 {
@@ -81,14 +76,14 @@ namespace TranspilerExplorer
         {
             var patch = MethodPatcher.CreateDynamicMethod(orig, DummyMethod, false);
             var il = patch.GetILGenerator();
-            var originalVariables = MethodPatcher.DeclareLocalVariables(il, orig);
+            var originalVariables = MethodPatcher.DeclareOriginalLocalVariables(il, orig);
             var copier = new MethodCopier(orig, il, originalVariables);
             var emitter = new Emitter(il, false);
 
             copier.AddTranspiler(transpiler ?? IdentityTranspiler);
 
             var endLabels = new List<Label>();
-            _ = copier.Finalize(emitter, endLabels, out var hasReturnCode);
+            _ = copier.Finalize(emitter, endLabels, out var hasReturnCode, out _);
 
             foreach (var label in endLabels)
                 emitter.MarkLabel(label);
@@ -154,13 +149,13 @@ namespace TranspilerExplorer
                 if (handler.CatchType != null)
                     handler.CatchType = handler.CatchType.Relink(relinker, clone);
 
-            for (int instri = 0; instri < body.Instructions.Count; instri++)
+            for (int instri = 0; instri < body.Instructions.Count(); instri++)
             {
-                Instruction instr = body.Instructions[instri];
+                Instruction instr = body.Instructions.ElementAt(instri);
                 object operand = instr.Operand;
 
                 if (operand is ParameterDefinition param)
-                    operand = clone.Parameters[param.Index];
+                    operand = clone.Parameters.ElementAt(param.Index);
                 else if (operand is IMetadataTokenProvider mtp)
                     operand = mtp.Relink(relinker, clone);
 
